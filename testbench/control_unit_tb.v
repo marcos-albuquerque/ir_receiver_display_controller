@@ -29,97 +29,63 @@ module control_unit_tb ();
         forever #10 clk_i = ~clk_i; // Period T = 20ns
     end
 
+    task get_cmd(input [7:0] cmd);
+        begin
+            cmd_i = cmd;  // POWER ON/OFF
+            valid_i = 1'b1; #20;
+            valid_i = 1'b0; #60;
+        end
+    endtask
+
     initial begin
         // Initializantion
         cmd_i = 8'h00;  // None button pressed
         valid_i = 1'b0;
         rst_i = 1'b1; #10;
         rst_i = 1'b0; #20;
-
-        // Sending commands:
         
         // Power on
-        cmd_i = 8'h7F;  // POWER ON/OFF
-        valid_i = 1'b1; #20;
-        cmd_i = 8'h00;  // None button pressed
-        valid_i = 1'b0; #20;
+        get_cmd(8'h7F);
 
         // changing channels
-        cmd_i = 8'hC7;  // CH-
-        valid_i = 1'b1; #20;
-        cmd_i = 8'h00;  // None button pressed
-        valid_i = 1'b0; #20; #100;
+        get_cmd(8'hC7); // CH-
+        get_cmd(8'hC7);
 
-        cmd_i = 8'hC7;  // CH-
-        valid_i = 1'b1; #20;
-        cmd_i = 8'h00;  // None button pressed
-        valid_i = 1'b0; #20;
+        get_cmd(8'hE7); // CH+
+        get_cmd(8'hE7);
+        get_cmd(8'hE7);
+        get_cmd(8'hE7);
+        get_cmd(8'hE7);
+        get_cmd(8'hE7);
 
-        cmd_i = 8'hC7;  // CH-
-        valid_i = 1'b1; #20;
-        cmd_i = 8'h00;  // None button pressed
-        valid_i = 1'b0; #20;
+        // Power off
+        get_cmd(8'h7F);
 
-        // cmd_i = 8'hE7;  // CH+
-        // valid_i = 1'b1; #40;
+        // changing volume
+        get_cmd(8'hF7); // VOL-
 
-        // cmd_i = 8'hE7;  // CH+
-        // valid_i = 1'b1; #40;
+        // Power on
+        get_cmd(8'h7F);
 
-        // cmd_i = 8'hE7;  // CH+
-        // valid_i = 1'b1; #40;
+        // changing volume
+        get_cmd(8'hF7); // VOL-
+        #320;
+        get_cmd(8'hCF); // VOL+
+        #120;
+        get_cmd(8'hCF);
+        #90;
+        get_cmd(8'hCF);
+        #40;
+        get_cmd(8'hCF);
+        #40;
+        get_cmd(8'hCF);
+        #40;
+        get_cmd(8'hCF);
+        #40;
+        get_cmd(8'hCF);
+        #320;
 
-        // cmd_i = 8'hE7;  // CH+
-        // valid_i = 1'b1; #40;
-
-        // cmd_i = 8'hE7;  // CH+
-        // valid_i = 1'b1; #40;
-
-        // // Power off
-        // cmd_i = 8'h7F;  // POWER ON/OFF
-        // valid_i = 1'b1; #40;
-
-        // // changing volume
-        // cmd_i = 8'hF7;  // VOL-
-        // valid_i = 1'b1; #40;
-
-        // // Power on
-        // cmd_i = 8'h7F;  // POWER ON/OFF
-        // valid_i = 1'b1; #40;
-
-        // // changing volume
-        // cmd_i = 8'hF7;  // VOL-
-        // valid_i = 1'b1; #40;
-
-        // cmd_i = 8'hF7;  // VOL-
-        // valid_i = 1'b1; #40;
-
-        // cmd_i = 8'hF7;  // VOL-
-        // valid_i = 1'b1; #40;
-
-        // cmd_i = 8'hCF;  // VOL+
-        // valid_i = 1'b1; #40;
-
-        // cmd_i = 8'hCF;  // VOL+
-        // valid_i = 1'b1; #40;
-
-        // #9000000; // 9ms
-
-        // cmd_i = 8'hCF;  // VOL+
-        // valid_i = 1'b1; #40;
-
-        // cmd_i = 8'hCF;  // VOL+
-        // valid_i = 1'b1; #40;
-
-        // cmd_i = 8'hCF;  // VOL+
-        // valid_i = 1'b1; #40;
-
-        // cmd_i = 8'h5F;  // OK/PLAY/PAUSE
-        // valid_i = 1'b1; #40;
-
-        // cmd_i = 8'hAF;  // MENU
-        // valid_i = 1'b1; #40;
-
-        // 24*20 = 480ns
+        get_cmd(8'h5F); // OK/PLAY/PAUSE
+        #320;
     end
 endmodule
