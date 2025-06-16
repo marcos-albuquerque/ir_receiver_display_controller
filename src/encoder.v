@@ -3,7 +3,7 @@ module encoder (
     input ch_vol_i,                    // 1: vol; 0: ch
     input [7:0] cmd_i,
     input [7:0] num_i,                 // channel/volume value
-    output [27:0] digits_val_o
+    output [27:0] digit_values_o
 );
 
     wire [11:0] bcd_digit;
@@ -46,6 +46,6 @@ module encoder (
         .segments(seg4)
     );
 
-    assign digits_val_o = {seg4, seg3, seg2, seg1};
+    assign digit_values_o = {seg4, seg3, seg2, seg1};
 
 endmodule
