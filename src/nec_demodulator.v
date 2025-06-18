@@ -89,8 +89,7 @@ module nec_demodulator (
         end else begin
             case (state)
                 IDLE: begin
-                    sr_address <= 0;
-                    sr_cmd <= 0;
+                    valid_o_ <= 0;
                     if (ir_falling) begin
                         half_time_flag <= 1;
                         state <= PREAMBLE_PULSE;

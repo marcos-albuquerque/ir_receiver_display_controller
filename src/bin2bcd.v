@@ -8,12 +8,12 @@ module bin2bcd (
   wire [3:0] U0bcd, U1bcd, U2bcd, U3bcd, U4bcd, U5bcd, U6bcd;
 
   function [3:0] add3;
-    input [3:0] bin;
+    input [3:0] bin_;
     begin
-      if (bin[3] || (bin[2] && (bin[1] || bin[0])))
-        add3 = bin + 4'd3;
+      if (bin_[3] || (bin_[2] && (bin_[1] || bin_[0])))
+        add3 = bin_ + 4'd3;
       else
-        add3 = bin;
+        add3 = bin_;
     end
   endfunction
 

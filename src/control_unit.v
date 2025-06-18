@@ -12,7 +12,7 @@ module control_unit (
 );
 
     // localparam TIME_5s = 28'd250_000_000;
-    localparam TIME_5s = 28'd28_124; // 9ms
+    localparam TIME_5s = 28'd15; // only for simulation
 
     localparam STAND_BY    = 3'd0,
                SHOW_CH     = 3'd1,
@@ -38,6 +38,7 @@ module control_unit (
     // internal regs
     reg [5:0] num_ch; // 1 to 63
     reg [6:0] num_vol; // 0 to 100
+    reg valid;
 
     // timer reg
     reg [27:0] timer_5s; // enought to count up to (5s)
@@ -51,6 +52,39 @@ module control_unit (
     end
 
     always @(posedge clk_i) begin
+        if (state == STAND_BY) begin
+            stand_by_o_ <= 1;
+        end else if (state == SHOW_CH) begin
+            mode_o_ <= 0;
+            ch_vol_o_ <= 0; // channel
+            num_o_ <= {2'b00, num_ch};
+        end else if(state == SHOW_VOL) begin
+            mode_o_ <= 0;
+            ch_vol_o_ <= 1; // volume
+            if (timer_5s == TIME_5s) begin
+                timer_5s <= 0;
+                state <= SHOW_CH;
+            end else begin
+                num_o_ <= {1'b0, num_vol};
+            end
+        end else if(state == SHOW_CMD) begin
+            mode_o_ <= 1;
+            if (timer_5s == TIME_5s) begin
+                timer_5s <= 0;
+                mode_o_ <= 0;
+                state <= SHOW_CH;
+            end else begin
+                cmd_o_ <= cmd_i;
+            end
+        end else if(state == PROCESS_CMD) begin
+            timer_5s <= 0;
+        end
+    end
+
+    always @(posedge clk_i) begin
+        if (valid_i) begin
+            valid <= 1;
+        end
         if (rst_i) begin
             state <= STAND_BY;
             stand_by_o_ <= 1;
@@ -60,24 +94,24 @@ module control_unit (
             num_o_ <= 0;
             num_ch <= 1;
             num_vol <= 0;
-        end else begin // if (valid_i)
+            valid <= 0;
+        end else if(valid) begin
             case (state)
-                STAND_BY: begin
-                    stand_by_o_ <= 1;
-                    if (cmd_i == 8'h7F && valid_i == 1) begin
+                STAND_BY: begin // state0
+                    if (cmd_i == POWER_ON_OFF) begin
                         stand_by_o_ <= 0;
+                        valid <= 0;
                         state <= SHOW_CH;
                     end
                 end
-                SHOW_CH: begin
-                    mode_o_ <= 0;
-                    num_o_ <= {2'b00, num_ch};
-                    if (cmd_i != 0 && valid_i == 1) begin
-                        state <= PROCESS_CMD;
-                    end
+                SHOW_CH: begin // state1
+                    // if (cmd_i != 0) begin
+                    state <= PROCESS_CMD;
+                    // end
                 end
-                PROCESS_CMD: begin
+                PROCESS_CMD: begin // state2
                     timer_5s <= 0;
+                    valid <= 0;
                     case (cmd_i)
                         POWER_ON_OFF: state <= STAND_BY; // POWER ON/OF
                         CH_DOWN: begin
@@ -95,7 +129,7 @@ module control_unit (
                             state <= SHOW_CH;
                         end
                         VOL_DOWN: begin
-                            if (num_vol > 1) begin
+                            if (num_vol > 0) begin
                                 num_vol <= num_vol - 1;
                             end
                             state <= SHOW_VOL;
@@ -104,37 +138,19 @@ module control_unit (
                             if (num_vol < 100) begin
                                 num_vol <= num_vol + 1;
                             end
-                            state <= SHOW_CH;
+                            state <= SHOW_VOL;
                         end
                         default: begin
-                            mode_o_ <= 1;
-                            cmd_o_ <= cmd_i;
                             state <= SHOW_CMD;
                         end
                     endcase
                 end
-                SHOW_VOL: begin
-                    mode_o_ <= 0;
-                    if (timer_5s == TIME_5s) begin
-                        timer_5s <= 0;
-                        state <= SHOW_CH;
-                    end else begin
-                        num_o_ <= {1'b0, num_vol};
-                    end
-
-                    if (cmd_i != 0 && valid_i == 1)
+                SHOW_VOL: begin // state3
+                    if (cmd_i != 0)
                         state <= PROCESS_CMD;
                 end
-                SHOW_CMD: begin
-                    if (timer_5s == TIME_5s) begin
-                        timer_5s <= 0;
-                        mode_o_ <= 0;
-                        state <= SHOW_CH;
-                    end else begin
-                        num_o_ <= cmd_i;
-                    end
-                    
-                    if (cmd_i != 0 && valid_i == 1)
+                SHOW_CMD: begin // state4          
+                    if (cmd_i != 0)
                         state <= PROCESS_CMD;
                 end
                 default: state <= STAND_BY;

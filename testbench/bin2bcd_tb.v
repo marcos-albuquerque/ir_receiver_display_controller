@@ -19,7 +19,6 @@ module bin2bcd_tb();
             #10;
         end
         #10;
-        $finish;
     end
 
 endmodule
