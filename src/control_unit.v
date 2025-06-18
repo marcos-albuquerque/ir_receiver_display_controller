@@ -129,7 +129,7 @@ module control_unit (
                             state <= SHOW_CH;
                         end
                         VOL_DOWN: begin
-                            if (num_vol > 1) begin
+                            if (num_vol > 0) begin
                                 num_vol <= num_vol - 1;
                             end
                             state <= SHOW_VOL;

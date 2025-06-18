@@ -5,14 +5,14 @@ module encoder_tb();
     reg ch_vol_i;
     reg [7:0] cmd_i;
     reg [7:0] num_i;
-    wire [27:0] digits_val_o;
+    wire [27:0] digit_values_o;
 
     encoder  uut(
         .mode_i(mode_i),
         .ch_vol_i(ch_vol_i),
         .cmd_i(cmd_i),
         .num_i(num_i),
-        .digits_val_o(digits_val_o)
+        .digit_values_o(digit_values_o)
     );
 
     initial begin
@@ -63,6 +63,10 @@ module encoder_tb();
 
         ch_vol_i = 1'b1;
         num_i = 8'd4;
+        #120;
+
+        mode_i = 1'b1;
+        cmd_i = 8'h5F;
         #120;
 
         // 13*120 + 40 = 13(100+10+10) + 40

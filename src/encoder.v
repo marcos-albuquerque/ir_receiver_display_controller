@@ -22,27 +22,27 @@ module encoder (
     end
 
     bin2bcd  bin2bcd_inst (
-        .bin(mode_i ? cmd_i : num_i),
+        .bin(num_i),
         .bcd(bcd_digit)
     );
 
     to_7segment  to_7segment_inst1 ( // LSD
-        .digit(bcd_digit[3:0]),
+        .digit(mode_i ? cmd_i[3:0] : bcd_digit[3:0]),
         .segments(seg1)
     );
 
     to_7segment  to_7segment_inst2 (
-        .digit(bcd_digit[7:4]),
+        .digit(mode_i ? cmd_i[7:4] : bcd_digit[7:4]),
         .segments(seg2)
     );
 
     to_7segment  to_7segment_inst3 (
-        .digit(mode_i ? ~bcd_digit[3:0]: bcd_digit[11:8]),
+        .digit(mode_i ? ~cmd_i[3:0]: bcd_digit[11:8]),
         .segments(seg3)
     );
     
     to_7segment  to_7segment_inst4 ( // MSD
-        .digit(mode_i ? ~bcd_digit[7:4] : v_or_c),
+        .digit(mode_i ? ~cmd_i[7:4] : v_or_c),
         .segments(seg4)
     );
 

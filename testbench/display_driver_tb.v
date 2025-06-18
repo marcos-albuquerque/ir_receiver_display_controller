@@ -3,11 +3,12 @@
 module display_driver_tb ();
 
     reg clk_50M_i;
-    reg clk_38k_i;
+    // reg clk_38k_i;
     reg rst_i;
     reg [27:0] digit_values_i;
     wire data_o;
     wire [3:0] digit_o;
+    wire load_n;
 
     wire clk_38k_o;
 
@@ -27,7 +28,8 @@ module display_driver_tb ();
         .rst_i(rst_i),
         .digit_values_i(digit_values_i),
         .data_o(data_o),
-        .digit_o(digit_o)
+        .digit_o(digit_o),
+        .load_n(load_n)
     );
 
     initial begin
